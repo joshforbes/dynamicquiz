@@ -1,0 +1,10 @@
+#wrapper {
+    width: 960px;
+    margin:auto;
+}
+
+#quizWindow {
+    margin: 10px;
+    height: 500px;
+    background: lightgray;
+}
