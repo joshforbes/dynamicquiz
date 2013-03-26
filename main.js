@@ -1,22 +1,26 @@
-questionArray = [
-    {   question: "Who is the blah blah blah",
-        choices: ["That Guy1", "That Guy2"],
+questionsArray = [
+    {   question: "Capitol of North Carolina",
+        choices: ["Charlotte", "Raleigh", "Greensboro", "Fayetteville"],
+        answer: "1"
+    },
+    {   question: "Capitol of Louisiana",
+        choices: ["New Orleans", "Shreveport", "Metairie", "Baton Rouge"],
+        answer: "3"
+    },
+    {   question: "Capitol of Connecticut",
+        choices: ["Hartford", "Bridgeport", "New Haven", "Bristol"],
         answer: "0"
     },
-    {   question: "Who is the yayaya",
-        choices: ["This Girl3", "This Girl2", "That Girl3"],
+    {   question: "Capitol of Nevada",
+        choices: ["Las Vegas", "Henderson", "Carson City", "Reno"],
         answer: "2"
-    },
-    {   question: "Who is the ufdasfa",
-        choices: ["That Guy1", "That Guy2"],
-        answer: "1"
     }
 ];
 
 
-var quizModule = function() {
-    var quizElement = document.querySelector("#quiz");
-    //this.questionArray = questionArray;
+var quizModule = function(questionArray) {
+
+    this.questionArray = questionArray;
     var questionObjectArray = [];
     var numberOfQuestions = questionArray.length;
     var questionCounter = 0;
@@ -172,6 +176,10 @@ var quizModule = function() {
     }
 
     function submit() {
+        if (getAnswer()){
+            getAnswer();
+        }
+
         var answerResults = calculateScore();
         var string = "<div class='results'><h1>Results:</h1><ul>";
         for (var i = 0; i < answerResults.length ; i ++){
@@ -214,11 +222,9 @@ var quizModule = function() {
     return {
         startQuiz: startQuiz,
         nextQuestion: nextQuestion,
-        previousQuestion: previousQuestion,
-        getAnswer: getAnswer
-
-     };
-}();
+        previousQuestion: previousQuestion
+    };
+}(questionsArray);
 
 window.onload = function() {
     quizModule.startQuiz();
