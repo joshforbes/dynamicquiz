@@ -3,8 +3,59 @@
     margin:auto;
 }
 
-#quizWindow {
-    margin: 10px;
-    height: 500px;
-    background: lightgray;
+#quiz {
+    width: 500px;
+    margin: auto;
+    background: lightgrey;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
+
+.question {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    background: darkgray;
+    padding: 5px;
+    border-bottom: 2px solid black
+}
+
+.question h1 {
+    font: bold 18px Arial;
+}
+
+.question ul {
+    list-style: none;
+    font: normal 12px Arial;
+    padding: 5px;
+    line-height: 1.5;
+}
+
+input {
+    border-radius: 10px;
+    font: italic bold 14px Arial;
+    background: black;
+    color: white;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+
+}
+
+.results {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    background: darkgray;
+    padding: 5px;
+    border-bottom: 2px solid black
+}
+
+.results h1 {
+    font: bold 18px Arial;
+}
+
+.results ul {
+    list-style: none;
+    font: 14px Arial;
+    padding: 5px;
+    line-height: 1.5;
+}
+
