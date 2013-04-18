@@ -1,77 +1,53 @@
-questionsArray = [
-    {   question: "Capitol of North Carolina",
-        choices: ["Charlotte", "Raleigh", "Greensboro", "Fayetteville"],
-        answer: "1"
-    },
-    {   question: "Capitol of Louisiana",
-        choices: ["New Orleans", "Shreveport", "Metairie", "Baton Rouge"],
-        answer: "3"
-    },
-    {   question: "Capitol of Connecticut",
-        choices: ["Hartford", "Bridgeport", "New Haven", "Bristol"],
-        answer: "0"
-    },
-    {   question: "Capitol of Nevada",
-        choices: ["Las Vegas", "Henderson", "Carson City", "Reno"],
-        answer: "2"
-    }
-];
-
-
-var quizModule = function(questionArray) {
-
+var quizModule = function(questionArray, quiz) {
     this.questionArray = questionArray;
+    this.quiz = quiz;
+
+    var quiz = $(quiz);
     var questionObjectArray = [];
     var numberOfQuestions = questionArray.length;
     var questionCounter = 0;
     var currentQuestionCounter = 0;
-    var fragment = document.createDocumentFragment();
 
-    function Question(question, choices, correctAnswer){
+    function Question(question, choices, correctAnswer) {
         this.question = question;
         this.choices = choices;
         this.correctAnswer = correctAnswer;
-        this.userAnswer = "";
     }
 
     Question.prototype = {
         constructor: Question,
 
-        getCorrectAnswer: function() {
+        getCorrectAnswer: function () {
             return this.correctAnswer;
         },
-        getUserAnswer: function() {
-            return this.userAnswer;
-        },
-        questionHTML: function(){
-            var questionElement = "<h1>" +
-                this.question + "</h1><ul>";
+        questionHTML: function () {
+            var questionElement = '<h1>' + this.question + '</h1><ul>';
             for (var i = 0; i < this.choices.length; i++){
-                questionElement += "<li><input type='radio' name='choice' value='" + [i] + "'>" + this.choices[i] + "</li>";
+                questionElement += '<li><input type="radio" name="choice' + questionCounter +
+                    '" value="' + [i] + '">' + this.choices[i] + '</li>';
             }
-            questionElement += "</ul>";
+            questionElement += '</ul>';
             return questionElement;
         },
         questionToDivElement: function() {
-            var child = this.questionHTML();
-            var div = document.createElement("div");
-            div.innerHTML = child;
-            div.id = "question" + questionCounter++;
-            div.className = "question";
+            var div = $('<div />',{
+                id: 'question' + questionCounter++,
+                addClass: 'question',
+            });
+            div.html(this.questionHTML());
             return div;
         }
-    }
-
+    };
 
     function createQuestionObject(){
-        var question = new Question(questionArray[0]["question"], questionArray[0]["choices"], questionArray[0]["answer"]);
-        //store our question object in array for later reference
+        var question = new Question(questionArray[0]["question"], questionArray[0]["choices"],
+            questionArray[0]["answer"]);
+        //store our question object in a new array for later reference
         questionObjectArray.push(question);
         //remove the question from the original array
         questionArray.shift();
 
-        //send the question object to the documentfragment for storage
-        fragment.appendChild(question.questionToDivElement());
+        quiz.append(question.questionToDivElement().hide());
     }
 
     function createQuestions(){
@@ -81,130 +57,116 @@ var quizModule = function(questionArray) {
     }
 
     function getCurrentQuestion(){
-        var quiz = document.querySelector("#quiz");
-        var currentQuestion = fragment.querySelector("#question" + currentQuestionCounter);
-        console.log(currentQuestion);
-        quiz.insertBefore(currentQuestion, document.querySelector("#quizPrevious"));
-    }
-
-    function removeCurrentQuestion(){
-        var currentQuestion = document.querySelector("#question" + currentQuestionCounter);
-        fragment.appendChild(currentQuestion);
+        var currentQuestion = $('#question' + currentQuestionCounter);
+        return currentQuestion;
     }
 
     function createButtons(){
-        var quiz = document.querySelector("#quiz");
+        var nextButton = $('<input />',{
+            id: 'quizNext',
+            type: 'button',
+            addClass: 'button',
+            value: 'Next',
+            click: nextQuestion
+        });
 
-        var nextButton = document.createElement("input");
-        nextButton.id = "quizNext";
-        nextButton.type = "button";
-        nextButton.value = "Next";
-        nextButton.onclick = function() {
-           nextQuestion();
-        }
+        var previousButton = $('<input />',{
+            id: 'quizPrevious',
+            type: 'button',
+            value: 'Previous',
+            addClass: 'button',
+            style: 'opacity: 0.4',
+            click: previousQuestion
+        });
 
-        var previousButton = document.createElement("input");
-        previousButton.id = "quizPrevious";
-        previousButton.type = "button";
-        previousButton.value = "Previous";
-        previousButton.onclick = function() {
-            previousQuestion();
-        }
-        previousButton.style.opacity = .4;
+        var submitButton = $('<input />',{
+            id: 'submit',
+            type: 'button',
+            addClass: 'button',
+            value: 'Submit',
+            click: submit
+        });
 
-        quiz.appendChild(previousButton);
-        quiz.appendChild(nextButton);
+        quiz.append(previousButton);
+        quiz.append(nextButton);
+        submitButton.appendTo(quiz).hide();
 
-    }
-
-    function nextQuestion() {
-        if (getAnswer()){
-            getAnswer();
-        }
-        if (currentQuestionCounter < numberOfQuestions - 1 ){
-            removeCurrentQuestion();
-            currentQuestionCounter++;
-            getCurrentQuestion();
-        }
-        if (currentQuestionCounter === numberOfQuestions - 1){
-            submitButtonToggle();
-        }
-
-        //if next is pushed then no longer on first question, full opacity on previous button
-        var button = document.querySelector("#quizPrevious");
-        button.style.opacity = 1;
-
-    }
-
-    function previousQuestion(){
-        if (getAnswer()){
-            getAnswer();
-        }
-
-        //change submit button back to next button if not at end of test
-        if (currentQuestionCounter === numberOfQuestions -1){
-            submitButtonToggle();
-        }
-
-        //gray out previous button if unusable
-        var previousButton = document.querySelector("#quizPrevious");
-        if (currentQuestionCounter === 1){
-            previousButton.style.opacity = .4;
-        }
-
-        //display previous question
-        if (currentQuestionCounter > 0){
-            removeCurrentQuestion();
-            currentQuestionCounter--;
-            getCurrentQuestion();
-        }
-    }
-
-    function submitButtonToggle() {
-        var button = document.querySelector("#quizNext");
-        if (button['value'] === 'Next'){
-            button['value'] = 'Submit';
-            button.onclick = function() {
-                submit();
+        //event handler for nextButton
+        function nextQuestion() {
+            if (currentQuestionCounter < numberOfQuestions - 1 ){
+                getCurrentQuestion().hide();
+                currentQuestionCounter++;
+                getCurrentQuestion().show();
             }
-        } else {
-            button['value'] = 'Next';
-            button.onclick = function(){
-                nextQuestion();
+            if (currentQuestionCounter === numberOfQuestions - 1){
+                $('#quizNext').toggle();
+                $('#submit').toggle();
+            }
+
+            //if next is pushed then no longer on first question, full opacity on previous button
+            var button = $('#quizPrevious');
+            button.fadeTo(200, 1);
+
+        }
+
+        //event handler for previousButton
+        function previousQuestion(){
+            //change submit button back to next button if not at end of test
+            if (currentQuestionCounter === numberOfQuestions -1){
+                $('#quizNext').toggle();
+                $('#submit').toggle();
+            }
+
+            //gray out previous button if unusable
+            var previousButton = $('#quizPrevious');
+            if (currentQuestionCounter === 1){
+                previousButton.fadeTo(200, 0.4);
+            }
+
+            //display previous question
+            if (currentQuestionCounter > 0){
+                getCurrentQuestion().hide();
+                currentQuestionCounter--;
+                getCurrentQuestion().show();
             }
         }
-    }
 
-    function submit() {
-        if (getAnswer()){
-            getAnswer();
+        //event handler for submitButton
+        function submit() {
+            var answerResults = calculateScore();
+            var string = '<div class="results"><h1>Results:</h1><ul>';
+            for (var i = 0; i < answerResults.length ; i ++){
+                string += '<li>Question ' + (i + 1) + ': ' + answerResults[i] + '</li>';
+            }
+            string += '</ul></div>';
+            quiz.html(string);
+
         }
-
-        var answerResults = calculateScore();
-        var string = "<div class='results'><h1>Results:</h1><ul>";
-        for (var i = 0; i < answerResults.length ; i ++){
-            string += "<li>Question " + (i + 1) + ": " + answerResults[i] + "</li>";
-        }
-        string += "</ul></div>"
-        document.querySelector("#quiz").innerHTML = string;
-
     }
 
 
+    //this is a MESS, come up with a better method
     function getAnswer(){
-        var radioButtons = document.querySelectorAll("input[type='radio']");
-        for (i in radioButtons){
-           if (radioButtons[i].checked){
-               questionObjectArray[currentQuestionCounter].userAnswer = radioButtons[i].value;
-               return true;
-           }
-        }
+        var userAnswerArray = [];
+        $('.question').each(function(index){
+            var radioButtons = $(this).find($('input[type="radio"]'));
+            for (var i in radioButtons){
+                if (radioButtons[i].checked){
+                    userAnswerArray.push(radioButtons[i].value);
+                }
+            }
+            if (!userAnswerArray[index]){
+                userAnswerArray.push('');
+            }
+        })
+        return userAnswerArray;
     }
 
     function calculateScore(){
+        var userAnswerArray = getAnswer();
         var answerResults = [];
         for (var i = 0; i < questionObjectArray.length; i++){
-            if (questionObjectArray[i]['correctAnswer'] === questionObjectArray[i]['userAnswer']){
+            if (questionObjectArray[i]['correctAnswer'] === userAnswerArray[i]){
                 answerResults[i] = 'Correct';
             } else {
                 answerResults[i] = 'Incorrect';
@@ -215,18 +177,16 @@ var quizModule = function(questionArray) {
 
     function startQuiz(){
         createQuestions();
-        getCurrentQuestion();
+        getCurrentQuestion().show();
         createButtons();
     }
 
     return {
-        startQuiz: startQuiz,
-        nextQuestion: nextQuestion,
-        previousQuestion: previousQuestion
+        startQuiz: startQuiz
     };
-}(questionsArray);
+}(questionArray, '#quiz');
 
 window.onload = function() {
     quizModule.startQuiz();
+};
 
-}
