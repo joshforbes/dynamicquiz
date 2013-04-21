@@ -180,7 +180,5 @@ var quizModule = function(questionArray, quiz) {
     };
 }(questionArray, '#quiz');
 
-window.onload = function() {
-    quizModule.startQuiz();
-};
+$(quizModule.startQuiz());
 
