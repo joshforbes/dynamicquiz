@@ -1,9 +1,15 @@
-Dynamic Quiz Revision 3
+Dynamic Quiz Revision 4
+-----------------------
+*Added jquery animations for transition between questions
+*code cleaned up via suggestions from JSHint
 
+
+Dynamic Quiz Revision 3
+-----------------------
 Refactored the quiz:
 * Added jquery
 * moved questions to a seperate file
 * general cleanliness
 
-this is probably still a heaping mess, but I think its getting cleaner with each revision
+
 

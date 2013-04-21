@@ -1,8 +1,5 @@
 var quizModule = function(questionArray, quiz) {
-    this.questionArray = questionArray;
-    this.quiz = quiz;
-
-    var quiz = $(quiz);
+    quiz = $(quiz);
     var questionObjectArray = [];
     var numberOfQuestions = questionArray.length;
     var questionCounter = 0;
@@ -17,9 +14,6 @@ var quizModule = function(questionArray, quiz) {
     Question.prototype = {
         constructor: Question,
 
-        getCorrectAnswer: function () {
-            return this.correctAnswer;
-        },
         questionHTML: function () {
             var questionElement = '<h1>' + this.question + '</h1><ul>';
             for (var i = 0; i < this.choices.length; i++){
@@ -32,7 +26,7 @@ var quizModule = function(questionArray, quiz) {
         questionToDivElement: function() {
             var div = $('<div />',{
                 id: 'question' + questionCounter++,
-                addClass: 'question',
+                addClass: 'question'
             });
             div.html(this.questionHTML());
             return div;
@@ -57,8 +51,7 @@ var quizModule = function(questionArray, quiz) {
     }
 
     function getCurrentQuestion(){
-        var currentQuestion = $('#question' + currentQuestionCounter);
-        return currentQuestion;
+        return $('#question' + currentQuestionCounter);
     }
 
     function createButtons(){
@@ -94,13 +87,14 @@ var quizModule = function(questionArray, quiz) {
         //event handler for nextButton
         function nextQuestion() {
             if (currentQuestionCounter < numberOfQuestions - 1 ){
-                getCurrentQuestion().hide();
-                currentQuestionCounter++;
-                getCurrentQuestion().show();
-            }
-            if (currentQuestionCounter === numberOfQuestions - 1){
-                $('#quizNext').toggle();
-                $('#submit').toggle();
+                getCurrentQuestion().stop().fadeOut(200, function(){
+                    currentQuestionCounter++;
+                    getCurrentQuestion().fadeIn(200);
+                    if (currentQuestionCounter === numberOfQuestions - 1){
+                        $('#quizNext').toggle();
+                        $('#submit').toggle();
+                    }
+                });
             }
 
             //if next is pushed then no longer on first question, full opacity on previous button
@@ -125,9 +119,10 @@ var quizModule = function(questionArray, quiz) {
 
             //display previous question
             if (currentQuestionCounter > 0){
-                getCurrentQuestion().hide();
-                currentQuestionCounter--;
-                getCurrentQuestion().show();
+                getCurrentQuestion().stop().fadeOut(200, function(){
+                    currentQuestionCounter--;
+                    getCurrentQuestion().fadeIn(200);
+                });
             }
         }
 
@@ -144,21 +139,20 @@ var quizModule = function(questionArray, quiz) {
         }
     }
 
-
     //this is a MESS, come up with a better method
     function getAnswer(){
         var userAnswerArray = [];
-        $('.question').each(function(index){
+        $('.question').each(function (index) {
             var radioButtons = $(this).find($('input[type="radio"]'));
-            for (var i in radioButtons){
-                if (radioButtons[i].checked){
+            for (var i in radioButtons) {
+                if (radioButtons[i].checked) {
                     userAnswerArray.push(radioButtons[i].value);
                 }
             }
-            if (!userAnswerArray[index]){
+            if (!userAnswerArray[index]) {
                 userAnswerArray.push('');
             }
-        })
+        });
         return userAnswerArray;
     }
 
