@@ -1,4 +1,5 @@
 questionArray = [
+
     {   "question": "Capitol of North Carolina",
         "choices": ["Charlotte", "Raleigh", "Greensboro", "Fayetteville"],
         "answer": "1"
@@ -15,4 +16,5 @@ questionArray = [
         "choices": ["Las Vegas", "Henderson", "Carson City", "Reno"],
         "answer": "2"
     }
+
 ];
