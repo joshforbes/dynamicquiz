@@ -5,57 +5,34 @@
 
 #quiz {
     width: 500px;
+    height: 200px;
     margin: auto;
-    background: lightgrey;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    padding: 5px 20px 20px 20px;
+    background: #366185;
+    color: #B4C9D9;
+    border: 3px solid #FFB451;
+    border-radius: 15px;
 }
 
-.question {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    background: darkgray;
-    padding: 5px;
-    border-bottom: 2px solid black
+#quiz h1 {
+    font: bold 20px Arial;
 }
 
-.question h1 {
-    font: bold 18px Arial;
-}
-
-.question ul {
+#quiz ul {
     list-style: none;
-    font: normal 12px Arial;
+    font: normal 14px Arial;
     padding: 5px;
     line-height: 1.5;
 }
 
 input {
+    border: 2px solid #FFB451;
     border-radius: 10px;
     font: italic bold 14px Arial;
-    background: black;
-    color: white;
-    padding: 5px 10px;
-    margin-bottom: 5px;
-
+    background: white;
+    color: #366185;
+    padding: 5px 20px;
 }
 
-.results {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    background: darkgray;
-    padding: 5px;
-    border-bottom: 2px solid black
-}
 
-.results h1 {
-    font: bold 18px Arial;
-}
-
-.results ul {
-    list-style: none;
-    font: 14px Arial;
-    padding: 5px;
-    line-height: 1.5;
-}
 
