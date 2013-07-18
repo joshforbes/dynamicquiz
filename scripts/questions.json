@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "question": "Capitol of North Carolina",
+        "choices": [
+            "Charlotte",
+            "Raleigh",
+            "Greensboro",
+            "Fayetteville"
+        ],
+        "answer": "Raleigh"
+    },
+    {
+        "id": 2,
+        "question": "Capitol of Louisiana",
+        "choices": [
+            "New Orleans",
+            "Shreveport",
+            "Metairie",
+            "Baton Rouge"
+        ],
+        "answer": "Baton Rouge"
+    },
+    {
+        "id": 3,
+        "question": "Capitol of Connecticut",
+        "choices": [
+            "Hartford",
+            "Bridgeport",
+            "New Haven",
+            "Bristol"
+        ],
+        "answer": "Hartford"
+    },
+    {
+        "id": 4,
+        "question": "Capitol of Nevada",
+        "choices": [
+            "Las Vegas",
+            "Henderson",
+            "Carson City",
+            "Reno"
+        ],
+        "answer": "Carson City"
+    }
+]
