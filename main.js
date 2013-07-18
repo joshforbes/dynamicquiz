@@ -1,184 +1,189 @@
-var quizModule = function(questionArray, quiz) {
-    quiz = $(quiz);
-    var questionObjectArray = [];
-    var numberOfQuestions = questionArray.length;
-    var questionCounter = 0;
-    var currentQuestionCounter = 0;
+(function() {
 
-    function Question(question, choices, correctAnswer) {
-        this.question = question;
-        this.choices = choices;
-        this.correctAnswer = correctAnswer;
-    }
+var dynamicQuiz = {
 
-    Question.prototype = {
-        constructor: Question,
+    settings: {
+        currentQuestion: 0,
+        questionsTemplate: $('#quiz-template').html(),
+        resultsTemplate: $('#quiz-results-template').html(),
+        questionsContainer: $('#questions'),
+        resultsContainer: $('#results'),
+        buttons: $('#quiz input:button'),
+        nextButton: $('#quizNext'),
+        previousButton: $('#quizPrevious'),
+        submitButton: $('#quizSubmit'),
+        questionsURL: 'scripts/questions.json'
+    },
 
-        questionHTML: function () {
-            var questionElement = '<h1>' + this.question + '</h1><ul>';
-            for (var i = 0; i < this.choices.length; i++){
-                questionElement += '<li><input type="radio" name="choice' + questionCounter +
-                    '" value="' + [i] + '">' + this.choices[i] + '</li>';
-            }
-            questionElement += '</ul>';
-            return questionElement;
-        },
-        questionToDivElement: function() {
-            var div = $('<div />',{
-                id: 'question' + questionCounter++,
-                addClass: 'question'
-            });
-            div.html(this.questionHTML());
-            return div;
-        }
-    };
+    init: function() {
+        var self = this;
 
-    function createQuestionObject(){
-        var question = new Question(questionArray[0]["question"], questionArray[0]["choices"],
-            questionArray[0]["answer"]);
-        //store our question object in a new array for later reference
-        questionObjectArray.push(question);
-        //remove the question from the original array
-        questionArray.shift();
+        //assign the result of getData to a promise
+        var dataPromise = this.getData();
 
-        quiz.append(question.questionToDivElement().hide());
-    }
-
-    function createQuestions(){
-        for (var i = 0; i < numberOfQuestions; i++){
-            createQuestionObject();
-        }
-    }
-
-    function getCurrentQuestion(){
-        return $('#question' + currentQuestionCounter);
-    }
-
-    function createButtons(){
-        var nextButton = $('<input />',{
-            id: 'quizNext',
-            type: 'button',
-            addClass: 'button',
-            value: 'Next',
-            click: nextQuestion
+        //upon the fulfilment of dataPromise, call functions to create question
+        //objects and attach to handlebars template. Create a questionPromise 
+        //that will indicate when these actions have been completed
+        var questionPromise = dataPromise.then(function(data) {
+            self.createQuestions(data);
+            self.attachQuestionsTemplate();
+            return data;
         });
 
-        var previousButton = $('<input />',{
-            id: 'quizPrevious',
-            type: 'button',
-            value: 'Previous',
-            addClass: 'button',
-            style: 'opacity: 0.4',
-            click: previousQuestion
+        questionPromise.then(function(data) {
+            self.bindEvents();
         });
 
-        var submitButton = $('<input />',{
-            id: 'submit',
-            type: 'button',
-            addClass: 'button',
-            value: 'Submit',
-            click: submit
+        questionPromise.then(function(data) {
+            self.questionToggle();
         });
+    },
 
-        quiz.append(previousButton);
-        quiz.append(nextButton);
-        submitButton.appendTo(quiz).hide();
+    //retrieve quiz questions from JSON file
+	getData: function() {
+        return $.getJSON(this.settings.questionsURL);
+    },
 
-        //event handler for nextButton
-        function nextQuestion() {
-            if (currentQuestionCounter < numberOfQuestions - 1 ){
-                getCurrentQuestion().stop().fadeOut(200, function(){
-                    currentQuestionCounter++;
-                    getCurrentQuestion().fadeIn(200);
-                    if (currentQuestionCounter === numberOfQuestions - 1){
-                        $('#quizNext').toggle();
-                        $('#submit').toggle();
-                    }
-                });
-            }
-
-            //if next is pushed then no longer on first question, full opacity on previous button
-            var button = $('#quizPrevious');
-            button.fadeTo(200, 1);
-
-        }
-
-        //event handler for previousButton
-        function previousQuestion(){
-            //change submit button back to next button if not at end of test
-            if (currentQuestionCounter === numberOfQuestions -1){
-                $('#quizNext').toggle();
-                $('#submit').toggle();
-            }
-
-            //gray out previous button if unusable
-            var previousButton = $('#quizPrevious');
-            if (currentQuestionCounter === 1){
-                previousButton.fadeTo(200, 0.4);
-            }
-
-            //display previous question
-            if (currentQuestionCounter > 0){
-                getCurrentQuestion().stop().fadeOut(200, function(){
-                    currentQuestionCounter--;
-                    getCurrentQuestion().fadeIn(200);
-                });
-            }
-        }
-
-        //event handler for submitButton
-        function submit() {
-            var answerResults = calculateScore();
-            var string = '<div class="results"><h1>Results:</h1><ul>';
-            for (var i = 0; i < answerResults.length ; i ++){
-                string += '<li>Question ' + (i + 1) + ': ' + answerResults[i] + '</li>';
-            }
-            string += '</ul></div>';
-            quiz.html(string);
-
-        }
-    }
-
-    //this is a MESS, come up with a better method
-    function getAnswer(){
-        var userAnswerArray = [];
-        $('.question').each(function (index) {
-            var radioButtons = $(this).find($('input[type="radio"]'));
-            for (var i in radioButtons) {
-                if (radioButtons[i].checked) {
-                    userAnswerArray.push(radioButtons[i].value);
-                }
-            }
-            if (!userAnswerArray[index]) {
-                userAnswerArray.push('');
-            }
+    //maps the specified data to the Question constructor
+    createQuestions: function(data) {
+        this.questions = $.map(data, function(q) {
+            return new Question(q.id, q.question, q.choices, q.answer);
         });
-        return userAnswerArray;
-    }
+    },
 
-    function calculateScore(){
-        var userAnswerArray = getAnswer();
-        var answerResults = [];
-        for (var i = 0; i < questionObjectArray.length; i++){
-            if (questionObjectArray[i]['correctAnswer'] === userAnswerArray[i]){
-                answerResults[i] = 'Correct';
+    //attach handlebars questions template
+    attachQuestionsTemplate: function() {
+        var template = Handlebars.compile(this.settings.questionsTemplate);
+        this.settings.questionsContainer.append(template(this.questions));
+    },
+
+    //attach handlebars results template
+    attachResultsTemplate: function() {
+        var template = Handlebars.compile(this.settings.resultsTemplate);
+        this.settings.resultsContainer.append(template(this.results));
+    },
+
+    //bind event handlers to DOM elements
+    bindEvents: function() {
+        this.settings.nextButton.on('click', this.validateAnswer);
+        this.settings.submitButton.on('click', this.validateAnswer);
+        this.settings.buttons.on('click', this.questionController);
+        $('input:radio').on('change', this.storeAnswer);
+    },
+
+    //verify that user has selected an answer before proceeding
+    validateAnswer: function(event) {
+        var self = dynamicQuiz;
+
+        if (!self.questions[self.settings.currentQuestion].getUserAnswer()) {
+            alert('Please choose an answer');
+            event.stopImmediatePropagation();
+        }
+    },
+
+    //save user selected answer to question object
+    storeAnswer: function() {
+        var self = dynamicQuiz;
+
+        self.questions[self.settings.currentQuestion].setUserAnswer($(this).val());
+    },
+
+    //controls the state of the application
+    //handles button presses and determines what should be displayed
+    questionController: function(event) {
+        var self = dynamicQuiz;
+
+        if (event.target.value === 'Next' && self.settings.currentQuestion < self.questions.length - 1) {
+            self.nextQuestion();
+        }
+        if (event.target.value === 'Previous' && self.settings.currentQuestion > 0) {
+            self.previousQuestion();
+        }
+        if (event.target.value === 'Submit') {
+            self.getResults();
+            self.settings.questionsContainer.hide();
+            self.attachResultsTemplate();
+        }
+
+        self.submitToggle();
+        self.previousToggle();
+    },
+
+    nextQuestion: function() {
+        this.questionToggle();
+        this.settings.currentQuestion++;
+        this.questionToggle();
+    },
+
+    previousQuestion: function() {
+        this.questionToggle();
+        this.settings.currentQuestion--;
+        this.questionToggle();
+    },
+
+    //toggles display of current question
+    questionToggle: function() {
+        $('#question' + this.settings.currentQuestion).toggle();
+    },
+
+    //compares user answer to correct answer and maps result to an array
+    getResults: function() {
+        this.results = $.map(this.questions, function(value, index) {
+            if (value.getUserAnswer() === value.getCorrectAnswer()) {
+                return {
+                    'index': index + 1,
+                    'result': 'Correct'
+                };
             } else {
-                answerResults[i] = 'Incorrect';
+                return {
+                    'index': index + 1,
+                    'result': 'Incorrect'
+                };
             }
+        });
+    },
+
+    //helper function to switch between display of 'next' and 'submit' on last question
+    submitToggle: function() {
+        if (this.settings.currentQuestion === this.questions.length - 1) {
+            this.settings.nextButton.hide();
+            this.settings.submitButton.show();
+        } else {
+            this.settings.nextButton.show();
+            this.settings.submitButton.hide();
         }
-        return answerResults;
+    },
+
+    //helper function to toggle opacity of previous button when it is disabled
+    previousToggle: function() {
+        if (this.settings.currentQuestion === 0) {
+            this.settings.previousButton.addClass('faded');
+        } else {
+            this.settings.previousButton.removeClass('faded');
+        }
     }
+};
 
-    function startQuiz(){
-        createQuestions();
-        getCurrentQuestion().show();
-        createButtons();
+function Question(id, question, choices, answer) {
+    this.id = id;
+    this.question = question;
+    this.choices = choices;
+    this.answer = answer;
+    this.userAnswer = '';
+}
+
+Question.prototype = {
+    getCorrectAnswer: function() {
+        return this.answer;
+    },
+    getUserAnswer: function() {
+        return this.userAnswer;
+    },
+    setUserAnswer: function(answer) {
+        this.userAnswer = answer;
     }
+};
 
-    return {
-        startQuiz: startQuiz
-    };
-}(questionArray, '#quiz');
-
-$(quizModule.startQuiz());
+dynamicQuiz.init();
+})();
 

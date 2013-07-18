@@ -1,5 +1,19 @@
 Demo available at: http://www.joshdforbes.com/dynamicquiz/index.html
 
+Dynamic Quiz Revision 5
+-----------------------
+Revisiting my previous work on the quiz brought me to the realization
+that the code, while functional, was not ideal for readability or maintenance.
+So the 5th revision to the quiz is a complete rewrite to the application,
+the primary focus being on keeping funcitons small and organized.
+
+Other additions include:
+* Handlebars templates for HTML generation
+* Actual JSON for the quiz questions
+* Retrieving the JSON using a jquery AJAX call
+* The use of promise objects to handle async operations
+
+
 Dynamic Quiz Revision 4
 -----------------------
 *Added jquery animations for transition between questions

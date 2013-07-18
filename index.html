@@ -7,15 +7,43 @@
 </head>
 <body>
 <div id="wrapper">
-
     <div id="quiz">
-    </div>
-
+	    <div id="questions">
+	    	<script id="quiz-template" type="text/x-handlebars-template">
+		    	{{#each this}}
+				<div id="question{{@index}}" class="question hidden">
+					<h1>Question {{id}}:</h1>
+					<h2>{{question}}</h2>
+					<ul>
+						{{#each choices}}
+						<li><input type="radio" name="question{{../id}}" value="{{this}}">{{this}}</li>
+						{{/each}}
+					</ul>
+				</div>
+				{{/each}}
+			</script>
+			
+			<div id="buttons">
+				<input type="button" class="button faded" id="quizPrevious" value="Previous" />
+				<input type="button" class="button" id="quizNext" value="Next" />
+				<input type="button" class="button hidden" id="quizSubmit" value="Submit"/>
+			</div>
+		</div>
+    
+	    <div id='results'>
+	    	<script id="quiz-results-template" type="text/x-handlebars-template">
+	    		<ul>
+	    			{{#each this}}
+	    			<li><h2>Question {{index}}: {{result}}</h2></li>
+	    			{{/each}}
+	    		</ul>
+	    	</script>	
+	    </div>
+	 </div>
 </div>
 
+<script type="text/javascript" src="scripts/handlebars.js"></script>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="questions.json"></script>
 <script type="text/javascript" src="main.js"></script>
 </body>
 </html>
-

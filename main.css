@@ -5,7 +5,8 @@
 
 #quiz {
     width: 500px;
-    height: 200px;
+    height: 250px;
+    position: relative;
     margin: auto;
     padding: 5px 20px 20px 20px;
     background: #366185;
@@ -15,7 +16,11 @@
 }
 
 #quiz h1 {
-    font: bold 20px Arial;
+    font: bold 24px Arial;
+}
+
+#quiz h2 {
+    font: bold 18px Arial;
 }
 
 #quiz ul {
@@ -25,15 +30,32 @@
     line-height: 1.5;
 }
 
-input {
+#quiz input[type=button] {
+    width: 90px;
+    height: 30px;
     border: 2px solid #FFB451;
     border-radius: 10px;
     font: italic bold 14px Arial;
     background: white;
     color: #366185;
-    padding: 5px 20px;
     margin-left: 3px;
 }
+
+#buttons {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.faded {
+    opacity: .4;
+}
+
+.hidden {
+    display: none;
+}
+
+
 
 
 
