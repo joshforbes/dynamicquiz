@@ -1,0 +1,11 @@
+{
+	"folders":
+	[
+		{
+			"path": "/C/Users/Josh/www/dynamicquiz"
+		}
+	],
+	"ternjs": {
+		"libs": ["browser", "ecma5", "jquery"]
+	}
+}

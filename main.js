@@ -30,11 +30,11 @@ var dynamicQuiz = {
             return data;
         });
 
-        questionPromise.then(function(data) {
+        questionPromise.then(function() {
             self.bindEvents();
         });
 
-        questionPromise.then(function(data) {
+        questionPromise.then(function() {
             self.questionToggle();
         });
     },
